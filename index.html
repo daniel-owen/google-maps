@@ -16,14 +16,25 @@
 
 	<div id="map"></div>
 
-	<table border=1>
-		<tr ng-repeat="city in cities track by $index">
-			<td>
-				<a href="" ng-click="triggerClick($index)">{{city.city}}</a>
-			</td>
-			<td>{{city.state}}</td>
-		</tr>
-	</table>
+	<div>
+		<button ng-click="showTraffic()">Show Traffic</button>
+	</div>
+
+	<div id="list-window">
+		<form ng-submit="updateMarkers()">
+			<input id="filter-input" ng-model="citiesFilter" type="text">
+			<input type="submit" value="Update the map">
+
+			<table border=1>
+				<tr ng-repeat="city in (filteredCities = (cities | filter: citiesFilter)) track by $index">
+					<td>
+						<a href="" ng-click="triggerClick($index)">{{city.city}}</a>
+					</td>
+					<td>{{city.state}}</td>
+				</tr>
+			</table>
+		</form>
+	</div>
 
 </body>
 </html>

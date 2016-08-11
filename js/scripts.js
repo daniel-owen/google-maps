@@ -15,8 +15,12 @@ googleMapsApp.controller('googleMapsController', function($scope, $http){
 
 	// function to create markers and associated info windows/click listeners
 	function createMarker(city){
-		// log city object to the window
-		console.log(city);
+		var icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2%7CFE7569';
+		if(city.yearRank == 1){
+			icon = 'img/1.png';
+		}else if(city.yearRank == 39){
+			icon = 'img/atl.png';
+		}
 		// set lat/lon for city
 		var cityLatlng = {lat: city.lat, lng: city.lon};
 		// create marker for city
@@ -24,7 +28,8 @@ googleMapsApp.controller('googleMapsController', function($scope, $http){
 			{
 				position: cityLatlng,
 				map: map,
-				title: city.city
+				title: city.city,
+				icon: icon
 			}
 		);
 		// create info window for city
@@ -39,7 +44,7 @@ googleMapsApp.controller('googleMapsController', function($scope, $http){
         markers.push(marker);
 	}
 
-	// function that allows city text to simulate a marker being clicked
+	// function that allows clicking on city text links to simulate a marker being clicked
 	$scope.triggerClick = function(index){
 		google.maps.event.trigger(markers[index],"click");
 	}
@@ -51,5 +56,36 @@ googleMapsApp.controller('googleMapsController', function($scope, $http){
 	for(var i = 0; i < $scope.cities.length; i++){
 		createMarker($scope.cities[i]);
 	}
+
+	// function to display the traffic layer
+	$scope.showTraffic = function(){
+		var trafficLayer = new google.maps.TrafficLayer();
+		trafficLayer.setMap(map);
+	}
+
+	$scope.updateMarkers = function(){
+		for(var i = 0; i < markers.length; i++){
+			markers[i].setMap(null);
+		}
+		for(var i = 0; i < $scope.filteredCities.length; i++){
+			createMarker($scope.filteredCities[i]);
+		}
+	}
+
+	var directionsService = new google.maps.DirectionsService;
+	var directionsDisplay = new google.maps.DirectionsRenderer;
+		directionsDisplay.setMap(map);
+		directionsDisplay.setPanel(document.getElementById('list-window'));
+	directionsService.route({
+		origin: 'Atlanta, GA',
+		destination: 'New York, NY',
+		travelMode: 'DRIVING'
+	}, function(response, status) {
+		if (status === 'OK') {
+			directionsDisplay.setDirections(response);
+		} else {
+			window.alert('Directions request failed due to ' + status);
+		}
+	});
 
 });
